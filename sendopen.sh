@@ -1,6 +1,6 @@
 #!/bin/bash
 # By Wiesław Magusiak, 2013-10-27
-# Version 0.90
+# Version 0.91, 2013-10-30, modification of boot-time email subject
 # Sends sender's external and local IP's and the active network interface.
 # If sent by root, sudo -u $USER /path/to/user's/directory/.../sendmyip.sh.
 
@@ -17,8 +17,8 @@
 
 function myip () { 
 	if [ -f `whereis curl | cut -d" " -f2` ] ; then 
-		IP=$(curl -s checkip.dyndns.org)
-		IP=${IP#*: }; IP=${IP%%<*}
+		IP=$(curl -s ifconfig.me)
+		#IP=${IP#*: }; IP=${IP%%<*}
 	else
 		if [ -f `whereis wget | cut -d" " -f2` ] ; then 
 			IP=$(wget -q -O - checkip.dyndns.org)
@@ -39,7 +39,7 @@ done
 
 shift $((OPTIND - 1))
 RECIPIENT=${1-$USER}
-SUBJECT=${SUBJECT-"B-time msg from $RECIPIENT"}
+SUBJECT=${SUBJECT-"B-time msg from $HOSTNAME"}
 # If $RECIPIENT is not a qualified domain address, look for the address in /etc/aliases.
 if [[ $RECIPIENT == ${RECIPIENT%@*.*} ]]; then
 	if [[ -e /etc/aliases ]]; then
@@ -53,4 +53,5 @@ else
 	[[ $RECIPIENT == ${RECIPIENT%@.*} ]] || exit 5 	# Wrong e-mail address.
 fi
 
+sleep 1 	# One extra second to give systemd more time to start the network
 echo $(myip) | mail -s "$SUBJECT" $RECIPIENT
