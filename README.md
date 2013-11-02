@@ -36,7 +36,8 @@ ASSUMPTIONS
 - (Not required yet, see below) Thunderbird installed on the recipient's side.
 
 
-FURTHER DEVELOPMENT (as on 2013-10-27)
+FURTHER DEVELOPMENT (as on 2013-11-02)
 
-The author already uses a script that reads thunderbird's inbox to find out remote computer's IP and connects through ssh to that computer. The script is not universal yet, and so it cannot be published.
-The author will eventually make the script universal, but has no intension to make the script work with other e-mail clients.
+The author has published a script that reads thunderbird's inbox to find out remote host's IP and connect through ssh to that computer. The script is publish at http://github/wiemag/ssh-email-connector. There is also an Arch Linux package build (PKGBUILD) available at the http:/github/wiemag/PKGBUILDs for that script.
+
+The author has still no intension to make that script work with other e-mail clients but thunderbird.
