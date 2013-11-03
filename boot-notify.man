@@ -1,0 +1,98 @@
+.\" Man pages for boot-notify
+
+.TH man 1 "2013-11-03" "0.01" "boot-notify man pages"
+
+.SH NAME
+.B "boot-notify"
+
+The "boot-notify" package holds a systemd boot-notify.service and bn-sendopen.sh and bn-sendclose.sh scripts. The service triggers the scripts to send e-mail messages informing that the host has been switched on or off. Both the scripts may be run manually.
+
+.SH SYNOPSIS
+When invoked by boot-notify.service:
+.br
+.RS
+.B /usr/bin/sudo -u <USER> /usr/bin/bn-sendopen.sh
+.br
+.B /usr/bin/sudo -u <USER> /usr/bin/bn-sendclose.sh
+.RE
+.br
+.PP
+When run manually by a user:
+.br
+.RS
+.B bn-sendopen.sh  
+[\fB\-s\fR\fI SUBJECT\fR] [\fBrecipient\fR]
+.br
+.B bn-sendclose.sh 
+[\fB\-s\fR\fI SUBJECT\fR] [\fBrecipient\fR]
+.RE
+.br
+where the recipient should be a proper e-mail address.
+
+.SH "DESCRIPTION"
+If enabled, the boot-notify.service sends a boot-time notification e-mail message as soon as the network.target has been reached. Using this message a remote recipient is able to ssh into the host that has sent the message. The service sends a similar notice when the host is shutting down.
+.br
+
+For safety reasons, the e-mail messages contain information only about the host's current IP. No other information needed to ssh-log into the host is sent.
+
+
+.SH OPTIONS AND PARAMETERS
+.TP
+.B -s SUBJECT
+.br
+The subject of the message to be e-mailed. If not specified, as when used by the boot-notify.service, the SUBJECT defaults to "\fBB-time msg from $HOSTNAME\fR" or "\fBS-time msg from $HOSTNAME\fR" when used by bn-sendopen.sh and bn-sendclose.sh respectively.
+.PP
+.RS
+When the scripts are run manually, the SUBJECT may have any value, but the default values are the same as with the boot-notify.service.
+.RE
+.TP
+.B recipient
+.br
+The recipient should be a proper (domain) e-mail address. Any host system $USER may also be used providing the \fI/etc/aliases\fR file holds the \fIproper address(es)\fR for the $USER. If not specified, the \fI$recipient\fR defaults to the $USER that invokes the sending script.
+.PP
+
+.SH INSTALLATION
+The installation is carried out manually by copying the \fIbn-sendopen.sh\fR and \fIbn-sendclose.sh\fR scripts to the \fB/usr/bin\fR directory and by copying the \fIboot-notify.service\fR to the \fB/etc/systemd/system\fR directory.
+.PP
+The is also an Arch Linux PKGBUILD file available at \fIhttp://github/wiemag/PKGBUILDs\fR.
+.PP
+There must be a program providing the "\fBmail\fR" command line installed and configured on the host, e.g. \fIs-nail\fR, \fIheirloom-mailx\fR, or \fIsendmail\fR. There also must be an smtp client installed and configured, e.g. \fImsmtp\fR. In other words, there must be a command line system delivering e-mail installed and configured on the host.
+
+.SH CONFIGURATION AND USAGE OF THE SERVICE
+It is assumed here that a command line system delivering e-mail has been installed and configured on the host. It is recommended that this system should use gpg (gnu pg) to encrypt and conceal e-mail passwords. This recommendation extends to the "\fBssh-email-connector\fR" package.
+.PP
+Please note that the e-mail system needs to be configured separately for each \fI$USER\fR that intends to use it.
+.br
+Note also that the \fIroot\fR user needs to have such an e-mail system configured for him. If not, root has to use a system configured for a regular user.
+.br
+Finally, note that the \fBSYNOPSIS\fR section, above, shows how \fIroot\fR uses other user's e-mail configuration.
+.PP
+The \fBconfiguration of boot-notify.service\fR boils down to replacing the "\fI<USER>\fR" with the actual user name to be used, or to removing the whole "sudo" section from the command lines invoking bn-sendopen.sh and bn-sendclose.sh.
+.PP
+The configuration or rather the set-up is completed by enabling the boot-notify.service:
+.RS
+sudo systemctl enable boot-notify.service
+.RE
+
+.SH SEE ALSO
+.TP
+.B ssh-email-connector
+An ssh command  wrapper to connect to remote hosts, using the information e-mailed by boot-notify.service.
+.TP
+.B /etc/aliases
+Read about the sendmail's aliases file (/etc/aliases). For instance here:
+.RS
+.I 	http://www.gsp.com/cgi-bin/man.cgi?topic=aliases
+.br
+However, note that in this case \fI/etc/aliases\fR must contain domain type e-mail address(es).
+.RE
+
+.SH BUGS
+Please contact the author if you find any.
+
+.SH AUTHOR
+.AU
+Wiesław Magusiak <w.magusiak at gmail . com>
+
+.SH COPYRIGHT
+Do what you like with the boot-notify, but do not blame the author. No warranty is given, and no responsible is taken for the use.

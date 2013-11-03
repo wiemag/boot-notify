@@ -1,8 +1,9 @@
 #!/bin/bash
 # By Wiesław Magusiak, 2013-10-27
 # Version 0.91, 2013-10-30, modification of shutdown-time email subject
+# Version 0.92, 2013-11-03, change of the script's name; just new package version
 # Sends the local and external IP.
-# Dependencies:  See sendopen.sh.
+# Dependencies:  See bn-sendopen.sh.
 
 shift $((OPTIND - 1))
 RECIPIENT=${1-$USER}

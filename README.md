@@ -5,8 +5,8 @@ boot-notify
 
 
 SCRIPTS USED BY BOOT-NOTIFY
-- sendopen.sh  -  sends e-mail with information about the current local network IP and the current external IP;
-- sendclose.sh -  sends e-mail notifying that the host computer has been shut down.
+- bn-sendopen.sh  -  sends e-mail with information about the current local network IP and the current external IP;
+- bn-sendclose.sh -  sends e-mail notifying that the host computer has been shut down.
 
 Both the scripts can be called manually.
 
@@ -18,16 +18,17 @@ DEPENDENCIES AND CONFIGURATION REQUIREMENTS
 - systemd
 - msmtp   (or any other smtp client)
 - s-nail  (or heirloom-mailx) (MUA = Mail User Agent)
-- gpg     (optional)
+- gpg     (optional, see Note 3 below)
 - curl    (or wget)
+- sudo    (for root to send message as another user)
 
 Note 1: Both s-nail and heirloom-mailx provide command "mail" ("mailx") used to send mail to an SMTP server.
 
 Note 2: If you use msmtp create a symbolic link /usr/bin/sendmail pointing to /usr/bin/msmtp. You can do it manually, by installing sm-c (sendmail connector; see http://github/wiemag/sm-c), or by installing msmtp-mta.
 
-Note 3: The gpg is needed if you want to conceal your passwords. However, empty password to decode a file with the password is used. Still, it raises the security level of e-mail passwords.
+Note 3: The gpg is needed if you want to conceal your passwords. However, the empty password to decode a file with the e-mail password must be used for the decryption to work automatically during boot time. Still, it raises the security level of e-mail passwords.
 
-Note 4: Although the information sent at boot time is supposed to help ssh into the sender's computer, no information about SSH is included. The recipient has already got to know the port, the user name and the ssh password to be able to make such a connection.
+Note 4: Although the information sent at boot time is supposed to help ssh into the sender's computer, no information about SSH is included. The recipient has already got to know the port, the remote user name and the ssh password to be able to make such a connection.
 
 
 ASSUMPTIONS

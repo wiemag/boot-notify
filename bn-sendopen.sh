@@ -1,6 +1,7 @@
 #!/bin/bash
 # By Wiesław Magusiak, 2013-10-27
 # Version 0.91, 2013-10-30, modification of boot-time email subject
+# Version 0.92, 2013-11-03, change of the script's name; just new package version
 # Sends sender's external and local IP's and the active network interface.
 # If sent by root, sudo -u $USER /path/to/user's/directory/.../sendmyip.sh.
 
@@ -14,6 +15,7 @@
 #                       or mstp-mta
 # Command grep:     grep
 # Command cut:      coreutils
+# Command sudo:		sudo (only for the use with boot-notify.service)
 
 function myip () { 
 	if [ -f `whereis curl | cut -d" " -f2` ] ; then 

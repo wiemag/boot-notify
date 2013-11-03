@@ -1,15 +1,15 @@
 [Unit]
 Description= Boot time and shutdown time e-mail notification
-#Requires=netctl@static.service
-#After=netctl@static.service
 Requires=network.target
 After=network.target
 
 [Service]
 Type=oneshot
 # ONLY A TEMPLATE!!!!!!
-ExecStart=/usr/bin/sudo -u wm /home/wm/git/boot-notify/sendopen.sh
-ExecStop=/usr/bin/sudo -u wm /home/wm/git/boot-notify/sendclose.sh
+# Replace '<USER>' with your user name or remove the part
+# '/usr/bin/sudo -u wm ' for the root user to be the message sender.
+ExecStart=/usr/bin/sudo -u <USER> /usr/bin/bn-sendopen.sh
+ExecStop=/usr/bin/sudo -u <USER> /usr/bin/bn-sendclose.sh
 RemainAfterExit=yes
 
 [Install]
