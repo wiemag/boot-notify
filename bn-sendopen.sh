@@ -1,59 +1,31 @@
 #!/bin/bash
-# By Wiesław Magusiak, 2013-10-27
-# Version 0.91, 2013-10-30, modification of boot-time email subject
-# Version 0.92, 2013-11-03, change of the script's name; just new package version
+# By Wiesław Magusiak, 2013-10-27, 2015-12-13 wersion 0.93
 # Sends sender's external and local IP's and the active network interface.
-# If sent by root, sudo -u $USER /path/to/user's/directory/.../sendmyip.sh.
 
 # DEPENDENCIES
-# Command whereis:  util-linux
-# Command curl:     curl
-# Command wget:     wget (optional)
-# Command ip:       iproute2
-# Command mail:     s-nail (or heirloom-mailx) 
-#                   and msmtp + sm-c
-#                       or mstp-mta
-# Command grep:     grep
-# Command cut:      coreutils
-# Command sudo:		sudo (only for the use with boot-notify.service)
+# bind-tools (dig), iproute2 (ip), s-nail (mail)
 
-function myip () { 
-	if [ -f `whereis curl | cut -d" " -f2` ] ; then 
-		IP=$(curl -s ifconfig.me)
-		#IP=${IP#*: }; IP=${IP%%<*}
-	else
-		if [ -f `whereis wget | cut -d" " -f2` ] ; then 
-			IP=$(wget -q -O - checkip.dyndns.org)
-			IP=${IP#*: }; IP=${IP%%<*}
-		else
-			exit 1
-		fi
-	fi
-	IFACE=$(echo $(ip route)|cut -d" " -f5)
-	IP=$IP" "$(ip a show dev $IFACE | awk '$1 == "inet" { split($2, a, "/"); print a[1]; }')
-	echo $IP" "$IFACE
+function myIPs () {
+echo $(dig +short myip.opendns.com @resolver1.opendns.com) $(ip route|awk '/defau/ {print $7" "$5}')
 }
 
-while getopts  "s:" flag
-do
-	[[ "$flag" == "s" ]] && SUBJECT="$OPTARG" 			# E-mail subject
+while getopts  "s:" flag; do		# Read e-mail Subject, if any.
+	[[ "$flag" == "s" ]] && SUBJECT="$OPTARG" 	# E-mail subject
 done
-
 shift $((OPTIND - 1))
-RECIPIENT=${1-$USER}
-SUBJECT=${SUBJECT-"B-time msg from $HOSTNAME"}
-# If $RECIPIENT is not a qualified domain address, look for the address in /etc/aliases.
-if [[ $RECIPIENT == ${RECIPIENT%@*.*} ]]; then
+SUBJECT=${SUBJECT-"Boot notification from $HOSTNAME"} 	# Default Subject
+RECIPIENT=${1-$USER} 	# If $RECIPIENT is not a qualified domain address,
+						# look for the address in /etc/aliases.
+if [[ $RECIPIENT == ${RECIPIENT%@*} ]]; then # No '@' in the recipient name.
 	if [[ -e /etc/aliases ]]; then
-		RECIPIENT=$(cat /etc/aliases |grep -v ^\# |grep $RECIPIENT|cut -d" " -f2)
+		RECIPIENT=$(awk '!/^#/ && /^'${RECIPIENT}':/ {print $2;exit}' /etc/aliases)
 		RECIPIENT=${RECIPIENT%%,*}
-		[[ -z $RECIPIENT ]] && exit 4 				# E-mail address not found.
+		[[ -z $RECIPIENT ]] && exit 4 		# E-mail address not found.
 	else
-		exit 6 										# /etc/aliases does not exist.
+		exit 6 								# /etc/aliases does not exist.
 	fi
 else
-	[[ $RECIPIENT == ${RECIPIENT%@.*} ]] || exit 5 	# Wrong e-mail address.
+	[[ $RECIPIENT == ${RECIPIENT%@*.*} ]] && exit 5 	# Wrong e-mail address.
 fi
-
-sleep 1 	# One extra second to give systemd more time to start the network
-echo $(myip) | mail -s "$SUBJECT" $RECIPIENT
+#sleep 1
+echo $(myIPs) | mail -s "$SUBJECT" $RECIPIENT

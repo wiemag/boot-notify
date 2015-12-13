@@ -1,6 +1,6 @@
 .\" Man pages for boot-notify
 
-.TH man 1 "2013-11-03" "0.01" "boot-notify man pages"
+.TH man 1 "2015-12-13" "0.93" "boot-notify man pages"
 
 .SH NAME
 .B "boot-notify"
@@ -15,15 +15,16 @@ When invoked by boot-notify.service:
 .br
 .B /usr/bin/sudo -u <USER> /usr/bin/bn-sendclose.sh
 .RE
+Where <USER> is the user whose e-mail settings will be used to send the notification. See the 'CONFIGURATION' section below.
 .br
 .PP
 When run manually by a user:
 .br
 .RS
-.B bn-sendopen.sh  
+.B bn-sendopen.sh
 [\fB\-s\fR\fI SUBJECT\fR] [\fBrecipient\fR]
 .br
-.B bn-sendclose.sh 
+.B bn-sendclose.sh
 [\fB\-s\fR\fI SUBJECT\fR] [\fBrecipient\fR]
 .RE
 .br
@@ -40,7 +41,7 @@ For safety reasons, the e-mail messages contain information only about the host'
 .TP
 .B -s SUBJECT
 .br
-The subject of the message to be e-mailed. If not specified, as when used by the boot-notify.service, the SUBJECT defaults to "\fBB-time msg from $HOSTNAME\fR" or "\fBS-time msg from $HOSTNAME\fR" when used by bn-sendopen.sh and bn-sendclose.sh respectively.
+The subject of the message to be e-mailed. If not specified, as when used by the boot-notify.service, the SUBJECT defaults to "\fBBoot notification from $HOSTNAME\fR" or "\fBShutdown notification from $HOSTNAME\fR" when used by bn-sendopen.sh and bn-sendclose.sh respectively.
 .PP
 .RS
 When the scripts are run manually, the SUBJECT may have any value, but the default values are the same as with the boot-notify.service.
@@ -51,15 +52,33 @@ When the scripts are run manually, the SUBJECT may have any value, but the defau
 The recipient should be a proper (domain) e-mail address. Any host system $USER may also be used providing the \fI/etc/aliases\fR file holds the \fIproper address(es)\fR for the $USER. If not specified, the \fI$recipient\fR defaults to the $USER that invokes the sending script.
 .PP
 
-.SH INSTALLATION
-The installation is carried out manually by copying the \fIbn-sendopen.sh\fR and \fIbn-sendclose.sh\fR scripts to the \fB/usr/bin\fR directory and by copying the \fIboot-notify.service\fR to the \fB/etc/systemd/system\fR directory.
+
+.SH DEPENDENCIES
+.TP
+Formal dependencies:
+- bind-tools (command: dig)
+.br
+- gawk (comman: awk)
+.br
+- iproute2 (command: ip)
+.br
+- s-nail (command: mail)
+.br
+- msmtp
 .PP
-The is also an Arch Linux PKGBUILD file available at \fIhttp://github/wiemag/PKGBUILDs\fR.
+It is possible to modify the scripts and configurations in such a way that s-nail may be dropped, but the autor prefers using s-nail for many reasons, including an option to send e-mail messages with attachments from cron/systemd-timers.
+.PP
+
+
+.SH INSTALLATION
+Make sure that all dependencies have been installed, and install 'boot-notify' manually by copying the \fIbn-sendopen.sh\fR and \fIbn-sendclose.sh\fR scripts to the \fB/usr/bin\fR directory and by copying the \fIboot-notify.service\fR to the \fB/etc/systemd/system\fR directory.
+.PP
+Or use a package build. The is an Arch Linux PKGBUILD file available at \fIhttp://github/wiemag/PKGBUILDs\fR.
 .PP
 There must be a program providing the "\fBmail\fR" command line installed and configured on the host, e.g. \fIs-nail\fR, \fIheirloom-mailx\fR, or \fIsendmail\fR. There also must be an smtp client installed and configured, e.g. \fImsmtp\fR. In other words, there must be a command line system delivering e-mail installed and configured on the host.
 
 .SH CONFIGURATION AND USAGE OF THE SERVICE
-It is assumed here that a command line system delivering e-mail has been installed and configured on the host. It is recommended that this system should use gpg (gnu pg) to encrypt and conceal e-mail passwords. This recommendation extends to the "\fBssh-email-connector\fR" package.
+It is assumed here that a command line system delivering e-mail has been installed and configured on the host. It is recommended that this system should use gpg (gnu pg) to encrypt and conceal e-mail passwords. This recommendation extends to the "\fBssh-email-connector\fR" package. See the 'SEE ALSO' section below.
 .PP
 Please note that the e-mail system needs to be configured separately for each \fI$USER\fR that intends to use it.
 .br
